@@ -32,7 +32,7 @@
 
 - name: Add Docker APT repository
   apt_repository:
-    repo: deb https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    repo: "deb https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
 
 - name: Install Docker Packages
   apt:
@@ -44,22 +44,35 @@
       - docker-ce-cli
       - containerd.io
 
+- name: Ensure /etc/docker/ directory exists.
+  file:
+    path: /etc/docker
+    state: directory
+    mode: 0755
+  when: docker_daemon_options.keys() | length > 0
+
+- name: Configure Docker daemon options.
+  copy:
+    content: "{{ docker_daemon_options | to_nice_json }}"
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  when: docker_daemon_options.keys() | length > 0
+  notify: restart docker
+
 - name: Ensure group "docker" exists
   group:
     name: docker
     state: present
 
-- name: Add users to docker and sudo groups
+- name: Add users to docker groups
   user:
     name: "{{ item }}"
     groups:
-      - sudo
       - docker
     append: true
     state: present
     createhome: true
-  with_items: "{{ docker_group_users }}"
-
+  with_items: "{{ docker_users }}"
 
 - name: Ensure docker and contained service are enabled
   service:
@@ -70,12 +83,9 @@
     - docker
     - containerd
 
-- name: Modify docker daemon file
-  template:
-    src: daemon.json.j2
-    dest: "/etc/docker/daemon.json"
-    owner: root
-    group: root
-    mode: 0644
-    backup: true
-  notify: reload docker
+- name: Install Docker Compose (if configured).
+  get_url:
+    url: "{{ docker_compose_url }}"
+    dest: "{{ docker_compose_path }}"
+    mode: 0755
+  when: docker_install_compose

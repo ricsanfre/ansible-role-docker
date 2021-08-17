@@ -1,8 +1,15 @@
 ---
 - name: Converge
   hosts: all
-  become: yes
-  gather_facts: yes
-
+  become: true
+  gather_facts: true
+  vars:
+    docker_daemon_options:
+      exec-opts: 
+        - "native.cgroupdriver=systemd"
+      log-driver: "json-file"
+      log-opts:
+        max-size: "100m"
+      data-root: "/var/docker/lib"
   roles:
     - role: ricsanfre.docker

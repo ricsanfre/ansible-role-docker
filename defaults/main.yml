@@ -2,8 +2,13 @@
 # defaults file for docker
 
 # Users to be added to docker group
-docker_group_users: []
+docker_users: []
 
-# Docker daemon configuration
-docker_storage_driver: overlay2
-docker_data_dir: /var/lib/docker
+# Docker daemon /etc/daemon.json configuration
+docker_daemon_options: {}
+
+# Docker Compose options.
+docker_install_compose: true
+docker_compose_version: "1.29.2"
+docker_compose_url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+docker_compose_path: /usr/local/bin/docker-compose
