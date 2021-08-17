@@ -1,6 +1,8 @@
 Ansible Docker Role
 =========
 
+[![CI](https://github.com/ricsanfre/ansible-role-docker/actions/workflows/ci.yml/badge.svg)](https://github.com/ricsanfre/ansible-role-docker/actions/workflows/ci.yml)
+
 Install and configure Docker on Linux.
 
 Requirements
