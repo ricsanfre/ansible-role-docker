@@ -28,11 +28,11 @@
       - lsb-release
 
 - name: Add Docker GPG key
-  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  apt_key: url={{ docker_apt_gpg_key }}
 
 - name: Add Docker APT repository
   apt_repository:
-    repo: "deb https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    repo: "{{ docker_apt_repository }}"
 
 - name: Install Docker Packages
   apt:
@@ -82,6 +82,9 @@
   with_items:
     - docker
     - containerd
+
+- name: Ensure handlers are notified now.
+  meta: flush_handlers
 
 - name: Install Docker Compose (if configured).
   get_url:
