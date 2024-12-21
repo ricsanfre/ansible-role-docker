@@ -14,21 +14,22 @@
       - containerd
       - runc
 
-- name: Install packages to allow HTTPS instllation
+- name: Install packages to allow HTTPS installation
   apt:
     name: "{{ packages }}"
     update_cache: true
     state: present
   vars:
     packages:
-      - apt-transport-https
       - ca-certificates
       - curl
-      - gnupg
-      - lsb-release
 
-- name: Add Docker GPG key
-  apt_key: url={{ docker_apt_gpg_key }}
+- name: Download Docker GPG key.
+  get_url:
+    url: "{{ docker_apt_gpg_key_url }}"
+    dest: "{{ docker_apt_gpg_key }}"
+    mode: '0644'
+    force: true
 
 - name: Add Docker APT repository
   apt_repository:
@@ -43,6 +44,8 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
 
 - name: Ensure /etc/docker/ directory exists.
   file:
@@ -85,10 +88,3 @@
 
 - name: Ensure handlers are notified now.
   meta: flush_handlers
-
-- name: Install Docker Compose (if configured).
-  get_url:
-    url: "{{ docker_compose_url }}"
-    dest: "{{ docker_compose_path }}"
-    mode: 0755
-  when: docker_install_compose

@@ -7,14 +7,9 @@ docker_users: []
 # Docker daemon /etc/daemon.json configuration
 docker_daemon_options: {}
 
-# Docker Compose options.
-docker_install_compose: true
-docker_compose_version: "v2.2.3"
-docker_compose_url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-{{ ansible_architecture }}
-docker_compose_path: /usr/local/bin/docker-compose
-
 # Docker repo.
 docker_repo_url: https://download.docker.com/linux
+docker_apt_gpg_key_url: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+docker_apt_gpg_key: /etc/apt/keyrings/docker.asc
 docker_apt_release_channel: stable
-docker_apt_repository: "deb [arch={{ docker_arch }}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
-docker_apt_gpg_key: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+docker_apt_repository: "deb [arch={{ docker_arch }} signed-by={{ docker_apt_gpg_key }}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"

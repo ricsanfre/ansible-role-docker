@@ -39,13 +39,6 @@ docker_daemon_options:
     max-size: "100m"
   data-root: "/data/docker"
 ```
-Docker Compose installation options
-
-```yml
-docker_install_compose: true
-docker_compose_version: "1.29.2"
-docker_compose_path: /usr/local/bin/docker-compose
-```
 
 Dependencies
 ------------
