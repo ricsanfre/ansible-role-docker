@@ -2,7 +2,7 @@
 # tasks file for docker role
 
 - name: Remove old docker packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: true
     state: absent
@@ -15,7 +15,7 @@
       - runc
 
 - name: Install packages to allow HTTPS installation
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: true
     state: present
@@ -24,19 +24,27 @@
       - ca-certificates
       - curl
 
+- name: Ensure keyrings directory is created
+  ansible.builtin.file:
+    path: "{{ apt_keyrings_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Download Docker GPG key.
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ docker_apt_gpg_key_url }}"
     dest: "{{ docker_apt_gpg_key }}"
     mode: '0644'
     force: true
 
 - name: Add Docker APT repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ docker_apt_repository }}"
 
 - name: Install Docker Packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: true
   vars:
@@ -48,14 +56,14 @@
       - docker-compose-plugin
 
 - name: Ensure /etc/docker/ directory exists.
-  file:
+  ansible.builtin.file:
     path: /etc/docker
     state: directory
     mode: 0755
   when: docker_daemon_options.keys() | length > 0
 
 - name: Configure Docker daemon options.
-  copy:
+  ansible.builtin.copy:
     content: "{{ docker_daemon_options | to_nice_json }}"
     dest: /etc/docker/daemon.json
     mode: 0644
@@ -63,12 +71,12 @@
   notify: restart docker
 
 - name: Ensure group "docker" exists
-  group:
+  ansible.builtin.group:
     name: docker
     state: present
 
 - name: Add users to docker groups
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     groups:
       - docker
@@ -78,7 +86,7 @@
   with_items: "{{ docker_users }}"
 
 - name: Ensure docker and contained service are enabled
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     state: started
     enabled: true
@@ -87,4 +95,4 @@
     - containerd
 
 - name: Ensure handlers are notified now.
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

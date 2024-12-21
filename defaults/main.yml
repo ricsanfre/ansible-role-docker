@@ -10,6 +10,7 @@ docker_daemon_options: {}
 # Docker repo.
 docker_repo_url: https://download.docker.com/linux
 docker_apt_gpg_key_url: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
-docker_apt_gpg_key: /etc/apt/keyrings/docker.asc
+apt_keyrings_dir: /etc/apt/keyrings
+docker_apt_gpg_key: "{{ apt_keyrings_dir }}/docker.asc"
 docker_apt_release_channel: stable
 docker_apt_repository: "deb [arch={{ docker_arch }} signed-by={{ docker_apt_gpg_key }}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
